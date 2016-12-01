@@ -10,7 +10,11 @@ targets. MAMI uses this list to provide destination diversity for Internet
 path transparency studies, but we intend this resource to be of general
 utility to all active measurement studies of services in the Internet.
 
-Source measurement studies / target lists
+NOTE: this is very much a work in progress. The compiled public targets list
+and the scripts to build it are not yet done. This repository presently
+contains only sources.
+
+## Data Sources
 
 - MAMI project ECN measurements, June 2016 (see [blog post](https://mami-project.eu/index.php/2016/06/13/70-of-popular-web-sites-support-ecn/) / [notebooks](https://github.com/mami-project/ecn-conspiracy) )
 - isthewebhttp2yet.com, 16 November 2016
