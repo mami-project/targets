@@ -17,5 +17,5 @@ contains only sources.
 ## Data Sources
 
 - MAMI project ECN measurements, June 2016 (see [blog post](https://mami-project.eu/index.php/2016/06/13/70-of-popular-web-sites-support-ecn/) / [notebooks](https://github.com/mami-project/ecn-conspiracy) )
-- isthewebhttp2yet.com, 16 November 2016
-- RIPE Atlas Anchors, retrieved 22 November 2016
+- [isthewebhttp2yet.com](https://isthewebhttp2yet.com), 16 November 2016
+- [RIPE Atlas Anchors](https://atlas.ripe.net/about/anchors/), retrieved 22 November 2016
