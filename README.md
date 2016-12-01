@@ -12,5 +12,6 @@ utility to all active measurement studies of services in the Internet.
 
 Source measurement studies / target lists
 
+- MAMI project ECN measurements, June 2016 (see [blog post](https://mami-project.eu/index.php/2016/06/13/70-of-popular-web-sites-support-ecn/) / [notebooks](https://github.com/mami-project/ecn-conspiracy) )
 - isthewebhttp2yet.com, 16 November 2016
 - RIPE Atlas Anchors, retrieved 22 November 2016
