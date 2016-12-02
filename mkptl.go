@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 )
@@ -73,6 +74,7 @@ func main() {
 	default_svc := flag.Int("svc", 80, "Port number for top-level resolutions")
 	do_mx := flag.Bool("mx", false, "Also attempt to resolve MX addresses")
 	do_ns := flag.Bool("ns", false, "Also attempt to resolve NS addresses")
+	also := flag.String("also", "", "Also attempt to resolve additional name within domain")
 	resolver_count := flag.Int("resolvers", 32, "Maximum concurrent resolutions")
 	flag.Parse()
 
@@ -99,29 +101,12 @@ func main() {
 		output_wait.Done()
 	}()
 
-	// // start resolving pending entries
-	// for i := 0; i < resolver_count; i++ {
-	// 	go func() {
-	// 		var e *Entry
-	// 		for {
-	// 			e = <-pending_entries
-	// 			if e == nil {
-	// 				break
-	// 			}
-	// 			e.resolve()
-	// 			for _, se := range *e.sub {
-	// 				pending_entries <- &se
-	// 			}
-	// 			e.sub = nil
-	// 			finished_entries <- e
-	// 		}
-	// 	}()
-	// }
-
 	// now scan input and convert it to unresolved entries
+	lineNum := 0
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
+		lineNum++
 		line := scanner.Text()
 		fields := strings.Split(line, ",")
 
@@ -133,9 +118,20 @@ func main() {
 			e.do_ns = *do_ns
 			if len(fields) >= 2 {
 				e.aux = fields[1]
+			} else {
+				e.aux = strconv.Itoa(lineNum)
 			}
 
 			go do_resolution(e, finished, limiter, resolver_wait)
+
+			if len(*also) > 0 {
+				we := new(Entry)
+				we.name = *also + "." + fields[0]
+				we.svc = *default_svc
+				we.aux = e.aux
+
+				go do_resolution(we, finished, limiter, resolver_wait)
+			}
 		}
 	}
 
