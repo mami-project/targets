@@ -26,44 +26,43 @@ func (e *Entry) resolve() {
 	if aerr == nil {
 		e.addrs = addrs
 	} else {
-		log.Printf("A/AAAA resolution failed for %s: %s", e.name, string(aerr))
+		log.Printf("A/AAAA resolution failed for %s: %s", e.name, aerr)
 	}
 
 	if e.svc == 80 {
-		e.sub = make([]Entry)
+		e.sub = new([]Entry)
 
 		mxs, mxerr := net.LookupMX(e.name)
 		nss, nserr := net.LookupNS(e.name)
 
 		if mxerr == nil {
-			e.mxnames = make([]string, len(mxs))
 			for _, mx := range mxs {
-				e.sub = append(e.sub, Entry{name: mx.Host, svc: 25})
+				*e.sub = append(*e.sub, Entry{name: mx.Host, svc: 25})
 			}
 		} else {
-			log.Printf("MX resolution failed for %s: %s", e.name, string(mxerr))
+			log.Printf("MX resolution failed for %s: %s", e.name, mxerr)
 		}
 
 		if nserr == nil {
-			e.nsnames = make([]string, len(nss))
-			for i, ns := range nss {
-				e.sub = append(e.sub, Entry{name: ns.Host, svc: 53})
+			for _, ns := range nss {
+				*e.sub = append(*e.sub, Entry{name: ns.Host, svc: 53})
 			}
 		} else {
-			log.Printf("NS resolution failed for %s: %s", e.name, string(nserr))
+			log.Printf("NS resolution failed for %s: %s", e.name, nserr)
 		}
 	}
 }
 
 func main() {
 
-	pending_entries = make(chan *Entry, channel_depth)
-	finished_entries = make(chan *Entry, channel_depth)
+	pending_entries := make(chan *Entry, channel_depth)
+	finished_entries := make(chan *Entry, channel_depth)
 
 	// start writing output
 	go func() {
+		var e *Entry
 		for {
-			e <- finished_entries
+			e = <-finished_entries
 			if e == nil {
 				break
 			}
@@ -77,8 +76,9 @@ func main() {
 	// start resolving pending entries
 	for i := 0; i < resolver_count; i++ {
 		go func() {
+			var e *Entry
 			for {
-				e <- pending_entries
+				e = <-pending_entries
 				if e == nil {
 					break
 				}
@@ -96,9 +96,18 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
-		line = scanner.Text()
-		// comma: domain-name, aux pair
-		// no comma: just a domain name
+		line := scanner.Text()
+		fields := strings.Split(line, ",")
+
+		if len(fields) >= 1 {
+			e := new(Entry)
+			e.name = fields[0]
+			if len(fields) >= 2 {
+				e.aux = fields[1]
+			}
+
+			pending_entries <- e
+		}
 	}
 
 }
