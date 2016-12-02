@@ -27,7 +27,7 @@ func (e *Entry) resolve() {
 	if aerr == nil {
 		e.addrs = addrs
 	} else {
-		e.addrs = make([]net.IP, 1)
+		e.addrs = make([]net.IP, 0)
 	}
 
 	if e.do_ns || e.do_mx {
@@ -37,7 +37,7 @@ func (e *Entry) resolve() {
 			nss, nserr := net.LookupNS(e.name)
 			if nserr == nil {
 				for _, ns := range nss {
-					*e.sub = append(*e.sub, Entry{name: ns.Host, svc: 53})
+					*e.sub = append(*e.sub, Entry{name: ns.Host, svc: 53, aux: e.aux})
 				}
 			}
 		}
@@ -47,7 +47,7 @@ func (e *Entry) resolve() {
 
 			if mxerr == nil {
 				for _, mx := range mxs {
-					*e.sub = append(*e.sub, Entry{name: mx.Host, svc: 25})
+					*e.sub = append(*e.sub, Entry{name: mx.Host, svc: 25, aux: e.aux})
 				}
 			}
 		}
