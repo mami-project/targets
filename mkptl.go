@@ -21,35 +21,35 @@ type Entry struct {
 	do_ns bool
 }
 
-type NameSet struct {
-	names map[string]struct{}
-	lock  sync.RWMutex
-}
+// type NameSet struct {
+// 	names map[string]struct{}
+// 	lock  sync.RWMutex
+// }
 
-func (t *NameSet) addOnce(name string) bool {
-	t.lock.RLock()
-	_, ok := t.names[name]
-	t.lock.RUnlock()
+// func (t *NameSet) addOnce(name string) bool {
+// 	t.lock.RLock()
+// 	_, ok := t.names[name]
+// 	t.lock.RUnlock()
 
-	if ok {
-		return false
-	}
+// 	if ok {
+// 		return false
+// 	}
 
-	t.lock.Lock()
-	defer t.lock.Unlock()
-	_, ok = t.names[name]
-	if ok {
-		return false
-	}
-	t.names[name] = struct{}{}
-	return true
-}
+// 	t.lock.Lock()
+// 	defer t.lock.Unlock()
+// 	_, ok = t.names[name]
+// 	if ok {
+// 		return false
+// 	}
+// 	t.names[name] = struct{}{}
+// 	return true
+// }
 
-func NewNameSet() *NameSet {
-	out := new(NameSet)
-	out.names = make(map[string]struct{})
-	return out
-}
+// func NewNameSet() *NameSet {
+// 	out := new(NameSet)
+// 	out.names = make(map[string]struct{})
+// 	return out
+// }
 
 func (e *Entry) resolve() {
 	addrs, aerr := net.LookupIP(e.name)
@@ -88,23 +88,20 @@ func do_resolution(
 	e *Entry,
 	finished chan *Entry,
 	limiter chan struct{},
-	duplicates *NameSet,
 	wait *sync.WaitGroup) {
 
 	wait.Add(1)
 	defer wait.Done()
 
-	if duplicates.addOnce(strings.ToLower(e.name)) {
-		limiter <- struct{}{}
-		e.resolve()
-		if e.sub != nil {
-			for _, se := range *e.sub {
-				go do_resolution(&se, finished, limiter, duplicates, wait)
-			}
+	limiter <- struct{}{}
+	e.resolve()
+	if e.sub != nil {
+		for _, se := range *e.sub {
+			go do_resolution(&se, finished, limiter, wait)
 		}
-		finished <- e
-		_ = <-limiter
 	}
+	finished <- e
+	_ = <-limiter
 }
 
 func main() {
@@ -124,9 +121,6 @@ func main() {
 	// wait groups
 	resolver_wait := new(sync.WaitGroup)
 	output_wait := new(sync.WaitGroup)
-
-	// duplicate table
-	duplicates := NewNameSet()
 
 	// start writing output
 	go func() {
@@ -166,7 +160,7 @@ func main() {
 				e.aux = strconv.Itoa(lineNum)
 			}
 
-			go do_resolution(e, finished, limiter, duplicates, resolver_wait)
+			go do_resolution(e, finished, limiter, resolver_wait)
 
 			if len(*also) > 0 {
 				we := new(Entry)
@@ -174,7 +168,7 @@ func main() {
 				we.svc = *default_svc
 				we.aux = e.aux
 
-				go do_resolution(we, finished, limiter, duplicates, resolver_wait)
+				go do_resolution(we, finished, limiter, resolver_wait)
 			}
 		}
 	}
