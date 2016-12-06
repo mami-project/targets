@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/mami-project/targets"
-	"mkptl"
 	"net"
 	"os"
 	"strconv"
@@ -66,7 +65,7 @@ func do_resolution(
 	wait.Add(1)
 	defer wait.Done()
 
-	if duplicates.addOnce(strings.ToLower(e.name)) {
+	if duplicates.AddOnce(strings.ToLower(e.name)) {
 		e.resolve()
 		if e.sub != nil {
 			for _, se := range *e.sub {
