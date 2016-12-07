@@ -4,9 +4,22 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/mami-project/targets"
+	"net"
 	"os"
 	"strings"
 )
+
+var priva, privb, privc *net.IPNet
+
+func Is1918(ip net.IP) bool {
+	return priva.Contains(ip) || privb.Contains(ip) || privc.Contains(ip)
+}
+
+func init() {
+	_, priva, _ = net.ParseCIDR("10.0.0.0/8")
+	_, privb, _ = net.ParseCIDR("172.16.0.0/12")
+	_, privc, _ = net.ParseCIDR("192.168.0.0/16")
+}
 
 func main() {
 
@@ -19,10 +32,22 @@ func main() {
 		line := scanner.Text()
 		fields := strings.Split(line, ",")
 
-		ip := fields[0]
+		ipstr := fields[0]
 		port := fields[1]
 
-		if addrset.AddOnce(ip + "," + port) {
+		ip := net.ParseIP(ipstr)
+
+		// skip non global unicast addresses
+		if !ip.IsGlobalUnicast() {
+			continue
+		}
+
+		// skip RFC 1918 addresses
+		if Is1918(ip) {
+			continue
+		}
+
+		if addrset.AddOnce(ipstr + "," + port) {
 			fmt.Println(line)
 		}
 
