@@ -10,12 +10,26 @@ targets. MAMI uses this list to provide destination diversity for Internet
 path transparency studies, but we intend this resource to be of general
 utility to all active measurement studies of services in the Internet.
 
-NOTE: this is very much a work in progress. The compiled public targets list
-and the scripts to build it are not yet done. This repository presently
-contains only sources.
+## Targets
+
+The target lists are provided as CSV files without header, with the following columns:
+
+- 0: IP address (either IPv4 or IPv6)
+- 1: Service number (80 = web, 25 = mail (listed as MX), 53 = dns (listed as NS))
+- 2: An FQDN associated with the IP address
+
+The most recent target lists were compiled and resolved on 7 December 2016:
+
+- [Web servers](https://github.com/mami-project/targets/blob/master/public-targets-20161207-http.csv?raw=true)
+- [Mail servers](https://github.com/mami-project/targets/blob/master/public-targets-20161207-smtp.csv?raw=true)
+- [DNS servers](https://github.com/mami-project/targets/blob/master/public-targets-20161207-dns.csv?raw=true)
 
 ## Data Sources
 
-- MAMI project ECN measurements, June 2016 (see [blog post](https://mami-project.eu/index.php/2016/06/13/70-of-popular-web-sites-support-ecn/) / [notebooks](https://github.com/mami-project/ecn-conspiracy) )
+We take targets from the following measurement studies:
+
+- MAMI project ECN measurements, June 2016 (see [blog post](https://mami-project.eu/index.php/2016/06/13/70-of-popular-web-sites-support-ecn/) / [notebooks](https://github.com/mami-project/ecn-conspiracy) ) and December 2016 (results pending).
 - [isthewebhttp2yet.com](https://isthewebhttp2yet.com), 16 November 2016
 - [RIPE Atlas Anchors](https://atlas.ripe.net/about/anchors/), retrieved 22 November 2016
+
+
