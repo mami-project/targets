@@ -26,10 +26,18 @@ The most recent target lists were compiled and resolved on 7 December 2016:
 
 ## Data Sources
 
-We take targets from the following measurement studies:
+We take targets from a variety of sources:
+
+### Currently Integrated
 
 - MAMI project ECN measurements, June 2016 (see [blog post](https://mami-project.eu/index.php/2016/06/13/70-of-popular-web-sites-support-ecn/) / [notebooks](https://github.com/mami-project/ecn-conspiracy) ) and December 2016 (results pending).
+
+### In raw_sources, Not Yet Integrated
+
 - [isthewebhttp2yet.com](https://isthewebhttp2yet.com), 16 November 2016
 - [RIPE Atlas Anchors](https://atlas.ripe.net/about/anchors/), retrieved 22 November 2016
 
+### Planned
+
+- [Cisco Umbrella One Million](https://blog.opendns.com/2016/12/14/cisco-umbrella-1-million/); since this has a different source (DNS queries as opposed to tests that have already been run), will require different (probably minor) preprocessing.
 
